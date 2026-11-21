@@ -68,6 +68,21 @@ Salão demo: `/b/belle-essence`
 | `ASAAS_ENVIRONMENT` | `sandbox` ou `production` |
 | `ASAAS_WALLET_ID` | ID da carteira Asaas (opcional) |
 | `ASAAS_WEBHOOK_TOKEN` | Token de segurança do webhook (opcional, recomendado) |
+| `EVOLUTION_API_URL` | URL base da Evolution API (ex.: `https://evolution.seudominio.com`) |
+| `EVOLUTION_API_KEY` | Chave global da Evolution API (header `apikey`) |
+| `EVOLUTION_INSTANCE` | Nome da instância WhatsApp conectada na Evolution |
+| `CRON_SECRET` | Segredo que protege o endpoint de lembretes (`Authorization: Bearer <CRON_SECRET>`) |
+
+### Lembrete automático de WhatsApp (10 minutos antes)
+O sistema avisa a cliente automaticamente quando está chegando a sua vez no salão.
+
+Fluxo:
+1. Configure a Evolution API (`EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, `EVOLUTION_INSTANCE`) e o `CRON_SECRET` no `.env`/painel do Render.
+2. Crie um **Cron Job** no Render (ou qualquer agendador externo) que chame `GET https://seu-dominio/api/cron/appointment-reminders` **a cada 1 minuto**, com o header `Authorization: Bearer <CRON_SECRET>`.
+3. O job consulta agendamentos ativos que iniciam entre 7 e 10 minutos à frente, envia a mensagem via Evolution API e registra uma notificação interna (`APPOINTMENT_REMINDER`) para a cliente.
+4. O campo `reminder_sent_at` do agendamento garante idempotência: cada agendamento recebe no máximo um lembrete. Se a API falhar, o campo é liberado para nova tentativa; se o horário for remarcado, o lembrete é reagendado.
+
+> Sem as variáveis da Evolution configuradas, o envio roda em **modo dry-run**: a mensagem apenas aparece no log do servidor (`[whatsapp:dry-run]`), sem enviar de fato. Útil para desenvolver/testar sem credenciais.
 
 ### Carteira Asaas (pagamentos das assinaturas)
 O painel **SUPER ADMIN → Carteira Asaas** (`/admin/asaas`) permite configurar API key, ambiente e carteira, visualizar saldo e cobranças, e registrar o webhook no Asaas.
@@ -111,16 +126,38 @@ src/
     dashboard/         # painel da proprietária
     cliente/           # área da cliente
     b/[slug]/          # página pública do salão
+    manifest.ts        # Web App Manifest (PWA)
+    offline/           # página de fallback sem conexão
   components/
     auth/ layout/ dashboard/ booking/ public/ client/ admin/ brand/ ui/
+    pwa-register.tsx   # registro do service worker
   lib/
     prisma.ts auth.ts scheduling.ts validations.ts utils.ts api.ts
-public/images/         # emblema VIXT Beauty (SVG)
+    whatsapp.ts        # integração Evolution API (lembretes)
+public/
+  images/              # emblema VIXT Beauty (SVG)
+  icons/               # ícones PWA (192/512/apple)
+  sw.js                # service worker
 ```
 
 ---
 
-## 5. Decisões técnicas
+## 5. PWA (instalável no celular)
+O VIXT Beauty é uma **Progressive Web App**: pode ser instalada na tela inicial de Android/iOS e abre em modo standalone, sem barra do navegador.
+
+- `src/app/manifest.ts` — nome, cores, ícones (192/512/maskable) e atalhos ("Minha agenda", "Agendar horário").
+- `public/sw.js` — service worker com cache do app shell, estratégia network-first para navegação e cache-first para assets estáticos (JS/CSS/imagens). APIs dinâmicas **nunca** são cacheadas.
+- `src/components/pwa-register.tsx` — registra o service worker **apenas em produção** (não interfere no HMR do `next dev`).
+- `src/app/offline/page.tsx` — página exibida quando não há conexão.
+- Ícones PNG gerados em `public/icons/` a partir do emblema vetorial.
+
+Para testar em produção: `npm run build && npm run start`, abra o site no celular (ou no Chrome DevTools → Application → Manifest) e use a opção **Instalar aplicativo**. O navegador exigirá **HTTPS** (Render já fornece).
+
+> Ao atualizar o service worker, bump a versão das constantes `CACHE`/`RUNTIME` em `public/sw.js` para invalidar os caches antigos.
+
+---
+
+## 6. Decisões técnicas
 
 - **Multi-tenancy por isolamento de dados:** todo endpoint da proprietária obtém `companyId` da sessão (membership), nunca do cliente.
 - **Snapshots históricos:** agendamentos guardam nome/preço do serviço e nome da profissional, preservando o histórico.
@@ -131,7 +168,7 @@ public/images/         # emblema VIXT Beauty (SVG)
 
 ---
 
-## 6. Deploy (Render + Neon)
+## 7. Deploy (Render + Neon)
 
 1. Crie um banco no Neon e copie a connection string.
 2. Crie um Web Service no Render apontando para este repositório.
@@ -140,7 +177,7 @@ public/images/         # emblema VIXT Beauty (SVG)
 
 ---
 
-## 7. Scripts úteis
+## 8. Scripts úteis
 
 ```bash
 npm run dev          # desenvolvimento

@@ -60,7 +60,13 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       const service = await prisma.service.findUnique({ where: { id: appt.serviceId } });
       const updated = await prisma.appointment.update({
         where: { id },
-        data: { startAt, endAt: addMinutes(startAt, service?.durationMin ?? 30), status: "CONFIRMED", rescheduleRequestedAt: null },
+        data: {
+          startAt,
+          endAt: addMinutes(startAt, service?.durationMin ?? 30),
+          status: "CONFIRMED",
+          rescheduleRequestedAt: null,
+          reminderSentAt: null,
+        },
       });
       await prisma.notification.create({
         data: {

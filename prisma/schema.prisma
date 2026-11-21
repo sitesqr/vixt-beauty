@@ -417,6 +417,8 @@ model Appointment {
   clientPhone    String?           @map("client_phone")
   cancellationReason String?       @map("cancellation_reason")
   rescheduleRequestedAt DateTime?  @map("reschedule_requested_at")
+  /// Momento em que o lembrete via WhatsApp foi enviado (idempotência do job).
+  reminderSentAt DateTime?         @map("reminder_sent_at")
   createdAt      DateTime          @default(now()) @map("created_at")
   updatedAt      DateTime          @updatedAt @map("updated_at")
 
