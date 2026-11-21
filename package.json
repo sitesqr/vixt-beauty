@@ -1,0 +1,51 @@
+{
+  "name": "vixt-beauty",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3001",
+    "build": "prisma generate && next build",
+    "start": "prisma migrate deploy && next start -H 0.0.0.0 -p 3001",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx --env-file=.env prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^18.0.10",
+    "jose": "^5.9.6",
+    "lucide-react": "^0.473.0",
+    "next": "^16.4.6",
+    "pg": "^8.23.1",
+    "prisma": "^7.10.1",
+    "react": "^19.2.9",
+    "react-dom": "^19.2.9",
+    "recharts": "^3.11.0",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.7",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.7",
+    "autoprefixer": "^10.4.20",
+    "playwright": "^1.65.1",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "effect": "^3.22.1"
+  }
+}

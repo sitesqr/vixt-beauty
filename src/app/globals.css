@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: #10090c;
+  color: #fbeef1;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .vixt-card {
+    @apply rounded-2xl border border-white/[0.07] bg-ink-850/80 shadow-card;
+  }
+  .vixt-input {
+    @apply w-full rounded-xl border border-white/10 bg-ink-900 px-4 py-3 text-sm text-white placeholder:text-rose-200/40 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20;
+  }
+  .vixt-label {
+    @apply mb-1.5 block text-xs font-medium text-rose-100/70;
+  }
+  .vixt-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .vixt-btn-primary {
+    @apply vixt-btn bg-rose-500 text-white shadow-glow hover:bg-rose-400 active:scale-[.98];
+  }
+  .vixt-btn-champagne {
+    @apply vixt-btn bg-champagne-500 text-ink-950 hover:bg-champagne-400 active:scale-[.98];
+  }
+  .vixt-btn-ghost {
+    @apply vixt-btn border border-white/10 bg-white/[0.03] text-rose-50/90 hover:bg-white/[0.07];
+  }
+  .vixt-btn-danger {
+    @apply vixt-btn bg-red-500/10 text-red-300 hover:bg-red-500/20;
+  }
+  .vixt-badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold;
+  }
+  .vixt-gradient-text {
+    @apply bg-gradient-to-r from-rose-200 via-rose-400 to-champagne-300 bg-clip-text text-transparent;
+  }
+  .vixt-divider {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-champagne-500/40 to-transparent;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #5a3e46;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7a5560;
+}
+
+::selection {
+  background: rgba(224, 85, 126, 0.35);
+}

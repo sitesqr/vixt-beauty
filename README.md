@@ -1,0 +1,120 @@
+# VIXT Beauty
+
+Plataforma SaaS multiempresas para gestão de **salões de beleza femininos**.
+
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Prisma 7 · PostgreSQL · Tailwind CSS · Recharts · jose (JWT) · bcrypt · Zod.
+
+---
+
+## 1. Visão geral
+
+O VIXT Beauty é um produto comercial independente, inspirado na arquitetura do VIXT Barber (referência técnica), porém pensado desde o início para a realidade de salões femininos: cabelo, coloração, unhas, sobrancelhas, maquiagem, estética e procedimentos.
+
+### Modelo comercial
+- **Proprietárias** pagam assinatura mensal (planos Starter / Profissional / Empresarial) com 14 dias de teste.
+- **Clientes finais** têm cadastro **100% gratuito**. Uma conta global serve para agendar em qualquer salão parceiro.
+- O financeiro da plataforma (faturas/pagamentos das proprietárias) é **separado** do financeiro do salão (receitas, comissões e despesas).
+
+### Ambientes
+| Ambiente | Rota | Descrição |
+|---|---|---|
+| Super Admin | `/admin` | Controle total da plataforma |
+| Proprietária | `/dashboard` | Gestão do salão |
+| Cliente | `/cliente` | Agendamentos e avaliações |
+| Página pública | `/b/{slug}` | Vitrine de cada salão |
+
+### Identidade visual
+Preto sofisticado, rosé gold, nude, champagne, branco e tons suaves de rosa. Emblema vetorial em `public/images/vixt-beauty-logo.svg` e favicon em `src/app/icon.svg`.
+
+---
+
+## 2. Rodando localmente
+
+### Pré-requisitos
+- Node.js 20.9+ (testado com 22)
+- PostgreSQL 14+
+
+### Passos
+```bash
+npm install
+cp .env.example .env   # edite DATABASE_URL e JWT_SECRET
+npx prisma migrate deploy
+npm run db:seed
+npm run dev            # http://localhost:3001
+```
+
+### Credenciais de demonstração (seed)
+| Perfil | E-mail | Senha |
+|---|---|---|
+| Super Admin | `admin@vixtbeauty.com` | `Admin@123` |
+| Proprietária | `demo@vixtbeauty.com` | `Demo@123` |
+| Cliente | `cliente@vixtbeauty.com` | `Cliente@123` |
+
+Salão demo: `/b/belle-essence`
+
+---
+
+## 3. Variáveis de ambiente
+
+| Variável | Descrição |
+|---|---|
+| `DATABASE_URL` | String de conexão PostgreSQL |
+| `JWT_SECRET` | Segredo para assinar tokens — `openssl rand -base64 64` |
+| `NEXT_PUBLIC_APP_URL` | URL base da aplicação |
+| `NODE_ENV` | `development` ou `production` |
+
+---
+
+## 4. Estrutura do projeto
+
+```
+prisma/
+  schema.prisma        # modelo de dados (multiempresa, planos, agendamentos...)
+  migrations/          # migrações SQL versionadas
+  seed.ts              # planos + salão demo com serviços femininos
+src/
+  app/
+    api/               # route handlers REST
+    admin/             # painel do super admin
+    dashboard/         # painel da proprietária
+    cliente/           # área da cliente
+    b/[slug]/          # página pública do salão
+  components/
+    auth/ layout/ dashboard/ booking/ public/ client/ admin/ brand/ ui/
+  lib/
+    prisma.ts auth.ts scheduling.ts validations.ts utils.ts api.ts
+public/images/         # emblema VIXT Beauty (SVG)
+```
+
+---
+
+## 5. Decisões técnicas
+
+- **Multi-tenancy por isolamento de dados:** todo endpoint da proprietária obtém `companyId` da sessão (membership), nunca do cliente.
+- **Snapshots históricos:** agendamentos guardam nome/preço do serviço e nome da profissional, preservando o histórico.
+- **Comissões:** ao concluir um agendamento, uma comissão é criada com a alíquota vigente da profissional.
+- **Disponibilidade:** slots de 15 minutos respeitam horários, time-offs e antecedência mínima (timezone `America/Sao_Paulo`).
+- **Pagamentos simulados:** planos, assinaturas, faturas e pagamentos são reais no banco com provedor `SIMULATED`, prontos para integração com Stripe/Mercado Pago.
+- **Segurança:** bcrypt (custo 12), JWT assinado (jose), hash SHA-256 persistido em `sessions`, cookies httpOnly + sameSite, validação Zod.
+
+---
+
+## 6. Deploy (Render + Neon)
+
+1. Crie um banco no Neon e copie a connection string.
+2. Crie um Web Service no Render apontando para este repositório.
+3. Configure as variáveis de ambiente.
+4. Build: `npm run build` · Start: `npm run start`.
+
+---
+
+## 7. Scripts úteis
+
+```bash
+npm run dev          # desenvolvimento
+npm run build        # build de produção
+npm run start        # produção (aplica migrações no boot)
+npm run db:seed      # dados de demonstração
+npx prisma migrate dev --name descricao
+npx prisma studio
+```
