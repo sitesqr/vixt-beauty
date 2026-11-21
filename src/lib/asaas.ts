@@ -241,7 +241,11 @@ export const ASAAS_REFERENCE_PREFIX = "VB-";
 
 /** Lista apenas as cobranças geradas por este app (externalReference prefixado com VB-). */
 export async function listPayments(limit = 100) {
-  const res = await request<{ data: AsaasPayment[] }>("GET", `/payments?limit=${limit}`);
+  // Filtro nativo da API: só traz cobranças com externalReference iniciado por VB-.
+  const res = await request<{ data: AsaasPayment[] }>(
+    "GET",
+    `/payments?externalReference=${encodeURIComponent(ASAAS_REFERENCE_PREFIX)}&limit=${limit}`
+  );
   const data = (res.data || []).filter(
     (p) => typeof p.externalReference === "string" && p.externalReference.startsWith(ASAAS_REFERENCE_PREFIX)
   );
