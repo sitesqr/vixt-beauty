@@ -168,10 +168,10 @@ export async function createCheckout(params: {
   const payload: Record<string, unknown> = {
     customer: params.customerId,
     billingTypes: [params.billingType || "UNDEFINED"],
+    chargeTypes: ["DETACHED"],
     value: params.valueCents / 100,
     description: params.description.slice(0, 120),
     externalReference: params.externalReference,
-    chargeType: "DETACHED",
   };
   if (cfg.walletId) payload.walletId = cfg.walletId;
   return request<{ id: string; url: string }>("POST", "/checkouts", payload);
