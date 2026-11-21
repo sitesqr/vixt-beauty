@@ -138,6 +138,7 @@ export type AsaasPayment = {
   pixQrCode?: string;
   pixCopyPaste?: string;
   customer?: string;
+  externalReference?: string | null;
 };
 
 /** Cria uma cobrança (PIX + boleto) no Asaas para uma fatura. */
@@ -235,9 +236,16 @@ export async function configureWebhook(webhookUrl: string, authToken?: string | 
   return request<unknown>("POST", "/webhooks", payload);
 }
 
-/** Lista cobranças da carteira (para conciliação). */
-export async function listPayments(limit = 50) {
-  return request<{ data: AsaasPayment[] }>("GET", `/payments?limit=${limit}`);
+/** Prefixo usado no externalReference de toda cobrança criada pelo VIXT Beauty. */
+export const ASAAS_REFERENCE_PREFIX = "VB-";
+
+/** Lista apenas as cobranças geradas por este app (externalReference prefixado com VB-). */
+export async function listPayments(limit = 100) {
+  const res = await request<{ data: AsaasPayment[] }>("GET", `/payments?limit=${limit}`);
+  const data = (res.data || []).filter(
+    (p) => typeof p.externalReference === "string" && p.externalReference.startsWith(ASAAS_REFERENCE_PREFIX)
+  );
+  return { data };
 }
 
 /** ID do evento do webhook a partir do payload (suporta vários formatos). */
