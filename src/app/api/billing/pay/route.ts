@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompanyContext } from "@/lib/auth";
 import { handleError, ok, fail } from "@/lib/api";
 import { z } from "zod";
-import { AsaasError, createCheckout, createCharge, ensureCustomer, getAsaasConfig } from "@/lib/asaas";
+import { AsaasError, createCheckout, createCharge, ensureCustomer, getAsaasConfig, getPixQrCode } from "@/lib/asaas";
 
 const schema = z.object({
   method: z.enum(["PIX", "CREDIT_CARD"]),
@@ -75,12 +75,13 @@ export async function POST(req: NextRequest) {
         throw e;
       }
       await prisma.invoice.update({ where: { id: invoice.id }, data: { providerRef: payment.id } });
+      const pix = await getPixQrCode(payment.id);
       return ok({
         method: "PIX",
         paymentId: payment.id,
         invoiceUrl: payment.invoiceUrl,
-        pixCopyPaste: payment.pixCopyPaste,
-        pixQrCode: payment.pixQrCode,
+        pixCopyPaste: pix.payload || payment.pixCopyPaste,
+        pixQrCode: pix.encodedImage || payment.pixQrCode,
         amountCents: invoice.amountCents,
         invoiceNumber: invoice.number,
       });

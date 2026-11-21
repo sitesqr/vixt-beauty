@@ -147,6 +147,15 @@ export async function getPayment(paymentId: string): Promise<AsaasPayment> {
   return request<AsaasPayment>("GET", `/payments/${paymentId}`);
 }
 
+/** Busca o QR Code e o código copia-e-cola de um PIX. */
+export async function getPixQrCode(paymentId: string): Promise<{ encodedImage?: string; payload?: string }> {
+  try {
+    return await request<{ encodedImage?: string; payload?: string }>("GET", `/payments/${paymentId}/pixQrCode`);
+  } catch {
+    return {};
+  }
+}
+
 /** Cria um checkout de cartão de crédito no Asaas (página de pagamento hospedada). */
 export async function createCheckout(params: {
   customerId: string;
