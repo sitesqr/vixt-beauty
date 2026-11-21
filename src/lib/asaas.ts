@@ -165,14 +165,29 @@ export async function createCheckout(params: {
   billingType?: "CREDIT_CARD" | "UNDEFINED";
 }): Promise<{ id: string; url: string }> {
   const cfg = await getAsaasConfig();
+  const baseUrl = process.env.RENDER_EXTERNAL_URL || process.env.NEXT_PUBLIC_APP_URL || "";
   const payload: Record<string, unknown> = {
     customer: params.customerId,
-    billingTypes: [params.billingType || "UNDEFINED"],
+    billingTypes: ["CREDIT_CARD"],
     chargeTypes: ["DETACHED"],
-    value: params.valueCents / 100,
-    description: params.description.slice(0, 120),
+    minutesToExpire: 60,
     externalReference: params.externalReference,
+    items: [
+      {
+        name: params.description.slice(0, 80),
+        description: params.description.slice(0, 120),
+        quantity: 1,
+        value: params.valueCents / 100,
+      },
+    ],
   };
+  if (baseUrl) {
+    payload.callback = {
+      successUrl: `${baseUrl}/dashboard/assinatura?status=success`,
+      cancelUrl: `${baseUrl}/dashboard/assinatura?status=canceled`,
+      expiredUrl: `${baseUrl}/dashboard/assinatura?status=expired`,
+    };
+  }
   if (cfg.walletId) payload.walletId = cfg.walletId;
   return request<{ id: string; url: string }>("POST", "/checkouts", payload);
 }
