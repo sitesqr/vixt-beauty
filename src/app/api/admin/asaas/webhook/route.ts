@@ -16,7 +16,13 @@ export async function POST() {
 
     // Gera um token seguro (>32 caracteres) e salva no banco para validar o header asaas-token.
     const authToken = cfg.webhookToken || `whsec_${randomBytes(32).toString("base64url")}`;
-    await configureWebhook(webhookUrl, authToken);
+    try {
+      await configureWebhook(webhookUrl, authToken);
+    } catch (e) {
+      // Se já existir um webhook idêntico, considerar sucesso (idempotente).
+      const message = e instanceof Error ? e.message : "";
+      if (!message.includes("Já existe")) throw e;
+    }
 
     const dbConfig = await prisma.asaasConfig.findFirst();
     if (dbConfig) await prisma.asaasConfig.update({ where: { id: dbConfig.id }, data: { webhookToken: authToken } });
