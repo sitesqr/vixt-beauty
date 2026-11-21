@@ -6,7 +6,12 @@ import { PublicShopClient } from "@/components/public/public-shop-client";
 
 export const dynamic = "force-dynamic";
 
-const API_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+// No Render, RENDER_EXTERNAL_URL é injetada automaticamente com a URL pública do serviço.
+// Isso evita chamadas SSR para um domínio desatualizado após renomear/recriar o serviço.
+const API_URL =
+  process.env.RENDER_EXTERNAL_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  "http://localhost:3001";
 
 async function loadShop(slug: string) {
   const res = await fetch(`${API_URL}/api/public/shop/${slug}`, { cache: "no-store" });
