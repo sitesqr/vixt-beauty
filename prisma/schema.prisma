@@ -19,16 +19,25 @@ enum UserRole {
   @@map("user_role")
 }
 
+enum AuthProvider {
+  CREDENTIALS @map("CREDENTIALS")
+  GOOGLE      @map("GOOGLE")
+
+  @@map("auth_provider")
+}
+
 model User {
-  id            String    @id @default(cuid())
+  id            String       @id @default(cuid())
   name          String
-  email         String    @unique
+  email         String       @unique
   phone         String?
-  passwordHash  String    @map("password_hash")
-  role          UserRole  @default(CLIENT)
-  avatarUrl     String?   @map("avatar_url")
-  emailVerified Boolean   @default(false) @map("email_verified")
-  active        Boolean   @default(true)
+  passwordHash  String?      @map("password_hash")
+  role          UserRole     @default(CLIENT)
+  authProvider  AuthProvider @default(CREDENTIALS) @map("auth_provider")
+  googleId      String?      @unique @map("google_id")
+  avatarUrl     String?      @map("avatar_url")
+  emailVerified Boolean      @default(false) @map("email_verified")
+  active        Boolean      @default(true)
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 

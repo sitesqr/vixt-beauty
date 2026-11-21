@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { GoogleButton } from "@/components/auth/google-button";
 
 export function RegisterClientForm() {
   const router = useRouter();
@@ -71,6 +72,11 @@ export function RegisterClientForm() {
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar minha conta grátis"}
         </button>
       </form>
+
+      <div className="mt-5">
+        <GoogleButton label="Cadastrar com Google" />
+      </div>
+
       <p className="mt-6 text-center text-sm text-rose-100/45">
         Já tem conta? <Link href="/login" className="font-medium text-rose-400 hover:text-rose-300">Entrar</Link>
       </p>

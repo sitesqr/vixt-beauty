@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { GoogleButton } from "@/components/auth/google-button";
 
 export function LoginForm() {
   const router = useRouter();
@@ -73,6 +74,10 @@ export function LoginForm() {
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Entrar <ArrowRight className="h-4 w-4" /></>}
         </button>
       </form>
+
+      <div className="mt-5">
+        <GoogleButton />
+      </div>
 
       <p className="mt-6 text-center text-sm text-rose-100/45">
         Ainda não tem conta?{" "}

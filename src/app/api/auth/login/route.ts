@@ -14,8 +14,13 @@ export async function POST(req: NextRequest) {
       include: { memberships: { select: { companyId: true } } },
     });
 
-    if (!user || !user.active || !(await verifyPassword(password, user.passwordHash))) {
-      return fail("E-mail ou senha incorretos", 401);
+    if (!user || !user.active || !user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
+      return fail(
+        user?.authProvider === "GOOGLE" && !user.passwordHash
+          ? "Esta conta usa login com Google. Clique em “Entrar com Google”."
+          : "E-mail ou senha incorretos",
+        401
+      );
     }
 
     await createSession(user);

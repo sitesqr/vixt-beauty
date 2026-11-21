@@ -62,6 +62,14 @@ Salão demo: `/b/belle-essence`
 | `JWT_SECRET` | Segredo para assinar tokens — `openssl rand -base64 64` |
 | `NEXT_PUBLIC_APP_URL` | URL base da aplicação |
 | `NODE_ENV` | `development` ou `production` |
+| `GOOGLE_CLIENT_ID` | Client ID OAuth do Google (verificação do ID token no servidor) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | O mesmo Client ID, usado pelo botão no navegador |
+
+### Login com Google (opcional, apenas clientes)
+1. No [Google Cloud Console](https://console.cloud.google.com/apis/credentials), crie uma credencial do tipo **ID do cliente OAuth**.
+2. Em **Origens JavaScript autorizadas**, adicione `http://localhost:3001` (dev) e o domínio de produção (ex.: `https://vixt-beauty.onrender.com`).
+3. Copie o Client ID para as duas variáveis acima.
+4. O botão aparece no login e no cadastro de cliente. Contas novas são criadas sem senha; contas já existentes com o mesmo e-mail são vinculadas automaticamente. Proprietárias e SUPER ADMIN continuam usando e-mail e senha.
 
 ---
 
