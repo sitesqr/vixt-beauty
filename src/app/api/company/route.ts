@@ -34,6 +34,7 @@ export async function PUT(req: NextRequest) {
           logoUrl: body.logoUrl || null,
           phone: body.phone || null,
           whatsapp: body.whatsapp || null,
+          cpfCnpj: body.cpfCnpj || null,
           address: body.address || null,
           city: body.city || null,
           state: body.state || null,

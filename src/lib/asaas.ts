@@ -71,7 +71,16 @@ export async function ensureCustomer(company: {
   cpfCnpj?: string | null;
 }): Promise<AsaasCustomer> {
   const existing = await prisma.asaasCustomer.findUnique({ where: { companyId: company.id } });
-  if (existing) return { id: existing.customerId, name: company.name, email: existing.email || undefined };
+  if (existing) {
+    // Atualiza o CPF/CNPJ no Asaas se foi cadastrado depois da criação do cliente.
+    if (company.cpfCnpj && company.cpfCnpj !== existing.cpfCnpj) {
+      try {
+        await request("PUT", `/customers/${existing.customerId}`, { cpfCnpj: company.cpfCnpj });
+        await prisma.asaasCustomer.update({ where: { id: existing.id }, data: { cpfCnpj: company.cpfCnpj } });
+      } catch { /* mantém cliente existente se a atualização falhar */ }
+    }
+    return { id: existing.customerId, name: company.name, email: existing.email || undefined };
+  }
 
   const cfg = await getAsaasConfig();
   const payload: Record<string, string> = {

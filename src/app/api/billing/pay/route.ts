@@ -54,16 +54,26 @@ export async function POST(req: NextRequest) {
       name: company.name,
       email: company.email,
       phone: company.phone,
+      cpfCnpj: company.cpfCnpj,
     });
 
     if (method === "PIX") {
-      const payment = await createCharge({
-        customerId: customer.id,
-        valueCents: invoice.amountCents,
-        dueDate: invoice.dueDate,
-        description: invoice.description || `Assinatura VIXT Beauty — ${invoice.number}`,
-        externalReference: invoice.number,
-      });
+      let payment;
+      try {
+        payment = await createCharge({
+          customerId: customer.id,
+          valueCents: invoice.amountCents,
+          dueDate: invoice.dueDate,
+          description: invoice.description || `Assinatura VIXT Beauty — ${invoice.number}`,
+          externalReference: invoice.number,
+        });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "";
+        if (msg.includes("CPF") || msg.includes("CNPJ")) {
+          return fail("Cadastre o CPF/CNPJ do salão em Configurações para gerar o PIX.", 400);
+        }
+        throw e;
+      }
       await prisma.invoice.update({ where: { id: invoice.id }, data: { providerRef: payment.id } });
       return ok({
         method: "PIX",

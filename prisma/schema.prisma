@@ -105,6 +105,7 @@ model Company {
   phone          String?
   whatsapp       String?
   email          String?
+  cpfCnpj        String?       @map("cpf_cnpj")
   address        String?
   addressNumber  String?       @map("address_number")
   complement     String?

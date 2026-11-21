@@ -10,7 +10,7 @@ const DAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sáb
 type WH = { dayOfWeek: number; openTime: string; closeTime: string; enabled: boolean };
 
 type Initial = {
-  name: string; description: string; logoUrl: string; phone: string; whatsapp: string; address: string;
+  name: string; description: string; logoUrl: string; phone: string; whatsapp: string; cpfCnpj: string; address: string;
   city: string; state: string; workingHours: WH[]; minAdvanceHours: number; minRescheduleHours: number;
 };
 
@@ -59,6 +59,11 @@ export function SettingsForm({ initial, planName }: { initial: Initial; planName
           </div>
           <div><label className="vixt-label">Telefone</label><input className="vixt-input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           <div><label className="vixt-label">WhatsApp</label><input className="vixt-input" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} /></div>
+          <div className="sm:col-span-2">
+            <label className="vixt-label">CPF / CNPJ do salão</label>
+            <input className="vixt-input" value={form.cpfCnpj} onChange={(e) => setForm({ ...form, cpfCnpj: e.target.value })} placeholder="000.000.000-00 ou 00.000.000/0001-00" />
+            <p className="mt-1 text-[11px] text-rose-100/40">Necessário para emitir notas e cobranças via PIX/cartão.</p>
+          </div>
           <div className="sm:col-span-2"><label className="vixt-label">Endereço</label><input className="vixt-input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
           <div><label className="vixt-label">Cidade</label><input className="vixt-input" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
           <div><label className="vixt-label">UF</label><input maxLength={2} className="vixt-input" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value.toUpperCase() })} /></div>

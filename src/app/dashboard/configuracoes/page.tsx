@@ -28,7 +28,7 @@ export default async function Page() {
       <SettingsForm
         initial={{
           name: company.name, description: company.description || "", logoUrl: company.logoUrl || "", phone: company.phone || "",
-          whatsapp: company.whatsapp || "", address: company.address || "", city: company.city || "",
+          whatsapp: company.whatsapp || "", cpfCnpj: company.cpfCnpj || "", address: company.address || "", city: company.city || "",
           state: company.state || "",
           workingHours: [0,1,2,3,4,5,6].map((d) => {
             const wh = company.workingHours.find((w) => w.dayOfWeek === d);
