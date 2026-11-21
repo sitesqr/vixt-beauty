@@ -145,12 +145,19 @@ export async function getWalletBalance(): Promise<{ balance: number }> {
 }
 
 /** Configura o webhook de pagamentos no Asaas. */
-export async function configureWebhook(webhookUrl: string) {
-  return request<unknown>("POST", "/webhook", {
+export async function configureWebhook(webhookUrl: string, authToken?: string | null) {
+  const payload: Record<string, unknown> = {
+    name: "VIXT Beauty - Assinaturas",
     url: webhookUrl,
     email: process.env.ASAAS_WEBHOOK_EMAIL || "admin@vixtbeauty.com",
-    events: ["PAYMENT_CONFIRMED", "PAYMENT_RECEIVED", "PAYMENT_OVERDUE", "PAYMENT_DELETED"],
-  });
+    enabled: true,
+    interrupted: false,
+    apiVersion: 3,
+    sendType: "SEQUENTIALLY",
+    events: ["PAYMENT_CONFIRMED", "PAYMENT_RECEIVED", "PAYMENT_OVERDUE"],
+  };
+  if (authToken) payload.authToken = authToken;
+  return request<unknown>("POST", "/webhooks", payload);
 }
 
 /** Lista cobranças da carteira (para conciliação). */
