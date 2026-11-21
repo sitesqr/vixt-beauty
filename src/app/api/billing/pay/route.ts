@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     await prisma.invoice.update({ where: { id: invoice.id }, data: { providerRef: checkout.id } });
     return ok({
       method: "CREDIT_CARD",
-      checkoutUrl: checkout.url,
+      checkoutUrl: checkout.link,
       amountCents: invoice.amountCents,
       invoiceNumber: invoice.number,
     });

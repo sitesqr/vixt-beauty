@@ -184,7 +184,7 @@ export async function createCheckout(params: {
   description: string;
   externalReference: string;
   billingType?: "CREDIT_CARD" | "UNDEFINED";
-}): Promise<{ id: string; url: string }> {
+}): Promise<{ id: string; link: string }> {
   const cfg = await getAsaasConfig();
   const baseUrl = process.env.RENDER_EXTERNAL_URL || process.env.NEXT_PUBLIC_APP_URL || "";
   const payload: Record<string, unknown> = {
@@ -210,7 +210,7 @@ export async function createCheckout(params: {
     };
   }
   if (cfg.walletId) payload.walletId = cfg.walletId;
-  return request<{ id: string; url: string }>("POST", "/checkouts", payload);
+  return request<{ id: string; link: string }>("POST", "/checkouts", payload);
 }
 
 /** Consulta o saldo da carteira (conta) no Asaas. */
