@@ -148,6 +148,7 @@ export async function getWalletBalance(): Promise<{ balance: number }> {
 export async function configureWebhook(webhookUrl: string) {
   return request<unknown>("POST", "/webhook", {
     url: webhookUrl,
+    email: process.env.ASAAS_WEBHOOK_EMAIL || "admin@vixtbeauty.com",
     events: ["PAYMENT_CONFIRMED", "PAYMENT_RECEIVED", "PAYMENT_OVERDUE", "PAYMENT_DELETED"],
   });
 }
