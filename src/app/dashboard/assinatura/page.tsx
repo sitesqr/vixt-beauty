@@ -4,6 +4,7 @@ import { CreditCard, Check, CalendarDays, AlertCircle } from "lucide-react";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/dashboard/ui";
+import { PaymentCard } from "@/components/dashboard/payment-card";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -52,6 +53,13 @@ export default async function Page() {
             )}
           </div>
         </div>
+      )}
+
+      {subscription && subscription.status !== "ACTIVE" && (
+        <PaymentCard
+          priceCents={subscription.plan.priceCents}
+          pendingCount={invoices.filter((i) => i.status === "PENDING").length}
+        />
       )}
 
       <div className="vixt-card mt-6 overflow-hidden">

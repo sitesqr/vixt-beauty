@@ -78,6 +78,13 @@ Fluxo:
 3. Em **Cobranças**, use **Cobrar no Asaas** para gerar um PIX de uma fatura pendente.
 4. Quando o pagamento é confirmado, o webhook marca a fatura como paga e reativa a assinatura automaticamente (idempotente por `eventId`).
 
+### Pagamento pelo painel da proprietária
+A proprietária vê um banner de arranque no dashboard quando a assinatura está em teste ou pendente, com o botão **Pagar assinatura** que leva a `/dashboard/assinatura`. Lá ela pode:
+- **Gerar PIX** — QR Code e código copia-e-cola gerados no Asaas.
+- **Pagar com cartão de crédito** — checkout hospedado seguro do Asaas.
+
+Após o pagamento, o webhook ativa a assinatura automaticamente.
+
 ### Login com Google (opcional, apenas clientes)
 1. No [Google Cloud Console](https://console.cloud.google.com/apis/credentials), crie uma credencial do tipo **ID do cliente OAuth**.
 2. Em **Origens JavaScript autorizadas**, adicione `http://localhost:3001` (dev) e o domínio de produção (ex.: `https://vixt-beauty.onrender.com`).

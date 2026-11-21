@@ -138,6 +138,27 @@ export async function getPayment(paymentId: string): Promise<AsaasPayment> {
   return request<AsaasPayment>("GET", `/payments/${paymentId}`);
 }
 
+/** Cria um checkout de cartão de crédito no Asaas (página de pagamento hospedada). */
+export async function createCheckout(params: {
+  customerId: string;
+  valueCents: number;
+  description: string;
+  externalReference: string;
+  billingType?: "CREDIT_CARD" | "UNDEFINED";
+}): Promise<{ id: string; url: string }> {
+  const cfg = await getAsaasConfig();
+  const payload: Record<string, unknown> = {
+    customer: params.customerId,
+    billingTypes: [params.billingType || "UNDEFINED"],
+    value: params.valueCents / 100,
+    description: params.description.slice(0, 120),
+    externalReference: params.externalReference,
+    chargeType: "DETACHED",
+  };
+  if (cfg.walletId) payload.walletId = cfg.walletId;
+  return request<{ id: string; url: string }>("POST", "/checkouts", payload);
+}
+
 /** Consulta o saldo da carteira (conta) no Asaas. */
 export async function getWalletBalance(): Promise<{ balance: number }> {
   const res = await request<{ balance?: number }>("GET", "/finance/balance");

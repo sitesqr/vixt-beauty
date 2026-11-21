@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   CalendarDays, CheckCircle2, XCircle, Users, UserCog, Wallet,
-  TrendingUp, Clock, ArrowRight, Star, Scissors, AlertCircle,
+  TrendingUp, Clock, ArrowRight, Star, Scissors, AlertCircle, Sparkles, CreditCard,
 } from "lucide-react";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { getSession } from "@/lib/auth";
@@ -101,16 +101,26 @@ export default async function OwnerDashboard() {
         }
       />
 
-      {subscription?.status === "TRIALING" && (
-        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-amber-500/25 bg-amber-500/[0.07] p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 shrink-0 text-champagne-400" />
-            <div>
-              <p className="text-sm font-semibold text-amber-200">Período de teste ativo</p>
-              <p className="text-xs text-amber-300/70">Você está testando o plano {subscription.plan.name} até {subscription.trialEndsAt?.toLocaleDateString("pt-BR")}.</p>
+      {subscription && ["TRIALING", "PAST_DUE", "EXPIRED"].includes(subscription.status) && (
+        <div className="mb-6 overflow-hidden rounded-2xl border border-champagne-500/30 bg-gradient-to-r from-champagne-500/[0.12] via-rose-500/[0.06] to-transparent p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-champagne-500/15 text-champagne-300"><Sparkles className="h-6 w-6" /></div>
+              <div>
+                <p className="text-base font-semibold text-white">
+                  {subscription.status === "PAST_DUE" ? "Assinatura pendente" : "Ative sua assinatura"}
+                </p>
+                <p className="mt-0.5 text-xs text-rose-100/60">
+                  {subscription.status === "TRIALING"
+                    ? `Período de teste do plano ${subscription.plan.name} até ${subscription.trialEndsAt?.toLocaleDateString("pt-BR")}. Gere seu PIX ou pague com cartão para continuar sem interrupção.`
+                    : `Sua assinatura do plano ${subscription.plan.name} precisa de pagamento. Regularize agora para reativar todos os recursos.`}
+                </p>
+              </div>
             </div>
+            <Link href="/dashboard/assinatura" className="vixt-btn-champagne !py-2.5 text-xs sm:shrink-0">
+              <CreditCard className="h-4 w-4" /> Pagar assinatura
+            </Link>
           </div>
-          <Link href="/dashboard/assinatura" className="vixt-btn-ghost !py-2 text-xs">Ver assinatura</Link>
         </div>
       )}
 
