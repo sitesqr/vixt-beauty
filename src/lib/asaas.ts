@@ -174,7 +174,7 @@ export async function createCheckout(params: {
     externalReference: params.externalReference,
     items: [
       {
-        name: params.description.slice(0, 80),
+        name: "Assinatura VIXT Beauty".slice(0, 30),
         description: params.description.slice(0, 120),
         quantity: 1,
         value: params.valueCents / 100,
