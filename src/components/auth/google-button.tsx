@@ -1,111 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/toast";
 
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (options: {
-            client_id: string;
-            callback: (response: { credential: string }) => void;
-            ux_mode?: "popup" | "redirect";
-            locale?: string;
-          }) => void;
-          renderButton: (
-            parent: HTMLElement,
-            options: Record<string, unknown>
-          ) => void;
-          prompt: () => void;
-        };
-      };
-    };
-  }
-}
-
-const SCRIPT_URL = "https://accounts.google.com/gsi/client";
-
-/** Botão oficial de login com Google (Identity Services). */
+/** Botão de login com Google via fluxo OAuth (redirect). Funciona sem scripts externos. */
 export function GoogleButton({ label = "Entrar com Google" }: { label?: string }) {
-  const router = useRouter();
-  const { toast } = useToast();
-  const divRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  useEffect(() => {
-    if (!clientId) {
-      setError("Login com Google indisponível (não configurado).");
-      return;
-    }
-
-    function render() {
-      if (!window.google || !divRef.current) return;
-      window.google.accounts.id.initialize({
-        client_id: clientId!,
-        ux_mode: "popup",
-        locale: "pt-BR",
-        callback: async ({ credential }) => {
-          setLoading(true);
-          try {
-            const res = await fetch("/api/auth/google", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ credential }),
-            });
-            const json = await res.json();
-            if (!res.ok) throw new Error(json.error?.message || "Falha ao entrar com Google");
-            toast("Bem-vinda ao VIXT Beauty!");
-            router.push(json.data.redirect);
-            router.refresh();
-          } catch (err: any) {
-            toast(err.message || "Falha ao entrar com Google", "error");
-          } finally {
-            setLoading(false);
-          }
-        },
-      });
-      window.google.accounts.id.renderButton(divRef.current, {
-        theme: "filled_black",
-        size: "large",
-        shape: "pill",
-        text: "continue_with",
-        logo_alignment: "center",
-        width: 320,
-      });
-      setReady(true);
-    }
-
-    if (window.google) {
-      render();
-      return;
-    }
-
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${SCRIPT_URL}"]`);
-    if (existing) {
-      existing.addEventListener("load", render);
-      return () => existing.removeEventListener("load", render);
-    }
-
-    const script = document.createElement("script");
-    script.src = SCRIPT_URL;
-    script.async = true;
-    script.onload = render;
-    script.onerror = () => setError("Não foi possível carregar o Google.");
-    document.head.appendChild(script);
-  }, [clientId, router, toast]);
-
-  if (!clientId || error) {
+  if (!clientId) {
     return (
       <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center text-xs text-rose-100/45">
-        {error || "Login com Google indisponível"}
+        Login com Google indisponível (não configurado)
       </div>
     );
   }
@@ -117,18 +22,21 @@ export function GoogleButton({ label = "Entrar com Google" }: { label?: string }
         <span className="text-[11px] uppercase tracking-wider text-rose-100/40">ou</span>
         <div className="vixt-divider flex-1" />
       </div>
-      <div ref={divRef} className="flex min-h-[44px] w-full items-center justify-center overflow-hidden rounded-full">
-        {!ready && (
-          <span className="flex items-center gap-2 text-sm text-rose-100/60">
-            <Loader2 className="h-4 w-4 animate-spin" /> {label}
-          </span>
-        )}
-      </div>
-      {loading && (
-        <p className="flex items-center justify-center gap-2 text-xs text-rose-300">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Conectando...
-        </p>
-      )}
+      <Link
+        href="/api/auth/google/start"
+        className="vixt-btn-ghost w-full !border-white/15 !bg-white/[0.04] !text-white"
+      >
+        <svg className="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.6.27-3.14.78-4.59l-7.98-6.19A23.94 23.94 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        {label}
+      </Link>
+      <p className="flex items-center justify-center gap-1.5 text-[11px] text-rose-100/35">
+        <Loader2 className="h-3 w-3" /> Você será direcionada ao Google com segurança
+      </p>
     </div>
   );
 }

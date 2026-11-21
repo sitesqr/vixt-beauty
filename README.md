@@ -68,8 +68,12 @@ Salão demo: `/b/belle-essence`
 ### Login com Google (opcional, apenas clientes)
 1. No [Google Cloud Console](https://console.cloud.google.com/apis/credentials), crie uma credencial do tipo **ID do cliente OAuth**.
 2. Em **Origens JavaScript autorizadas**, adicione `http://localhost:3001` (dev) e o domínio de produção (ex.: `https://vixt-beauty.onrender.com`).
-3. Copie o Client ID para as duas variáveis acima.
-4. O botão aparece no login e no cadastro de cliente. Contas novas são criadas sem senha; contas já existentes com o mesmo e-mail são vinculadas automaticamente. Proprietárias e SUPER ADMIN continuam usando e-mail e senha.
+3. Em **URIs de redirecionamento autorizados**, adicione também:
+   - `https://vixt-beauty.onrender.com/auth/google/callback`
+4. Copie o Client ID para as duas variáveis acima.
+5. O botão aparece no login e no cadastro de cliente. Contas novas são criadas sem senha; contas já existentes com o mesmo e-mail são vinculadas automaticamente. Proprietárias e SUPER ADMIN continuam usando e-mail e senha.
+
+> O fluxo usa OAuth com `response_type=id_token` e verificação do token no servidor via `google-auth-library` — não é necessário Client Secret.
 
 ---
 
