@@ -25,10 +25,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Verifica assinatura, audiência, emissor e validade do token.
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    let ticket;
+    try {
+      ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+    } catch {
+      return fail("Sessão do Google inválida ou expirada. Tente novamente.", 401);
+    }
     const payload = ticket.getPayload();
     if (!payload || !payload.email || !payload.email_verified) {
       return fail("Conta Google inválida ou e-mail não verificado", 401);
