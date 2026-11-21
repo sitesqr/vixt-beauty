@@ -24,7 +24,7 @@ O VIXT Beauty é um produto comercial independente, inspirado na arquitetura do 
 | Página pública | `/b/{slug}` | Vitrine de cada salão |
 
 ### Identidade visual
-Preto sofisticado, rosé gold, nude, champagne, branco e tons suaves de rosa. Emblema vetorial em `public/images/vixt-beauty-logo.svg` e favicon em `src/app/icon.svg`.
+Preto sofisticado, rosé gold, nude, champagne, branco e tons suaves de rosa. Logotipo em `public/images/vixt-beauty-logo-opt.png` (versão otimizada) e favicon/ícones PWA em `public/icons/`.
 
 ---
 
@@ -135,7 +135,7 @@ src/
     prisma.ts auth.ts scheduling.ts validations.ts utils.ts api.ts
     whatsapp.ts        # integração Evolution API (lembretes)
 public/
-  images/              # emblema VIXT Beauty (SVG)
+  images/              # logotipo VIXT Beauty (PNG otimizado)
   icons/               # ícones PWA (192/512/apple)
   sw.js                # service worker
 ```
@@ -149,7 +149,7 @@ O VIXT Beauty é uma **Progressive Web App**: pode ser instalada na tela inicial
 - `public/sw.js` — service worker com cache do app shell, estratégia network-first para navegação e cache-first para assets estáticos (JS/CSS/imagens). APIs dinâmicas **nunca** são cacheadas.
 - `src/components/pwa-register.tsx` — registra o service worker **apenas em produção** (não interfere no HMR do `next dev`).
 - `src/app/offline/page.tsx` — página exibida quando não há conexão.
-- Ícones PNG gerados em `public/icons/` a partir do emblema vetorial.
+- Ícones PNG gerados em `public/icons/` a partir do emblema da nova logotipo (recorte central). Ao trocar a logo, regenere os ícones e incremente a versão do cache em `public/sw.js`.
 
 Para testar em produção: `npm run build && npm run start`, abra o site no celular (ou no Chrome DevTools → Application → Manifest) e use a opção **Instalar aplicativo**. O navegador exigirá **HTTPS** (Render já fornece).
 

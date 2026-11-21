@@ -6,7 +6,7 @@ export function LogoImage({ className, priority = false }: { className?: string;
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/images/vixt-beauty-logo.svg"
+      src="/images/vixt-beauty-logo-opt.png"
       alt="VIXT Beauty — Gestão Inteligente para Salões de Beleza"
       className={cn("h-full w-full object-contain", className)}
       loading={priority ? "eager" : "lazy"}

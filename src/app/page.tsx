@@ -189,7 +189,7 @@ export default function Home() {
         <div className="relative overflow-hidden rounded-3xl border border-rose-400/20 bg-gradient-to-br from-rose-500/[0.10] via-ink-900 to-ink-900 px-6 py-14 text-center">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(238,121,152,.16),transparent_65%)]" />
           <div className="relative mx-auto mb-6 h-28 w-44">
-            <img src="/images/vixt-beauty-logo.svg" alt="VIXT Beauty — Gestão Inteligente para Salões de Beleza" className="h-full w-full object-contain" loading="lazy" />
+            <img src="/images/vixt-beauty-logo-opt.png" alt="VIXT Beauty — Gestão Inteligente para Salões de Beleza" className="h-full w-full object-contain" loading="lazy" />
           </div>
           <h2 className="relative text-3xl font-bold text-white md:text-4xl">
             Sua beleza começa com uma boa agenda.

@@ -1,9 +1,9 @@
 /* VIXT Beauty — Service Worker (PWA) */
-const CACHE = "vixt-beauty-v1";
-const RUNTIME = "vixt-beauty-runtime-v1";
+const CACHE = "vixt-beauty-v2";
+const RUNTIME = "vixt-beauty-runtime-v2";
 
 // Recursos do "app shell" pré-cacheados na instalação.
-const PRECACHE = ["/", "/icon.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/offline"];
+const PRECACHE = ["/", "/images/vixt-beauty-logo-opt.png", "/icons/icon-192.png", "/icons/icon-512.png", "/offline"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
