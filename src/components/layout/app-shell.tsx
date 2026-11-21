@@ -24,6 +24,7 @@ import {
   FileBarChart,
   ShieldCheck,
   Sparkles,
+  WalletCards,
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ const adminNav: NavItem[] = [
   { label: "Planos", href: "/admin/planos", icon: CreditCard },
   { label: "Assinaturas", href: "/admin/assinaturas", icon: Receipt },
   { label: "Cobranças", href: "/admin/cobrancas", icon: Wallet },
+  { label: "Carteira Asaas", href: "/admin/asaas", icon: WalletCards },
   { label: "Relatórios", href: "/admin/relatorios", icon: FileBarChart },
   { label: "Configurações", href: "/admin/configuracoes", icon: Settings },
 ];

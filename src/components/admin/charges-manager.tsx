@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, Receipt } from "lucide-react";
+import { Check, Loader2, Receipt, QrCode } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
@@ -11,11 +11,25 @@ type Invoice = {
   dueDate: string; paidAt: string | null; companyName: string; companySlug: string;
 };
 
-export function ChargesManager({ initial }: { initial: Invoice[] }) {
+export function ChargesManager({ initial, asaasConfigured = false }: { initial: Invoice[]; asaasConfigured?: boolean }) {
   const router = useRouter();
   const { toast } = useToast();
   const [items, setItems] = useState(initial);
   const [busy, setBusy] = useState<string | null>(null);
+  const [pix, setPix] = useState<{ url?: string; copy?: string } | null>(null);
+
+  async function chargeAsaas(inv: Invoice) {
+    setBusy(inv.id);
+    try {
+      const r = await fetch(`/api/asaas/charge/${inv.id}`, { method: "POST" });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error?.message || "Erro ao gerar cobrança");
+      setPix({ url: j.data.invoiceUrl, copy: j.data.pixCopyPaste });
+      toast("Cobrança PIX gerada no Asaas");
+      router.refresh();
+    } catch (e: any) { toast(e.message, "error"); }
+    finally { setBusy(null); }
+  }
 
   async function markPaid(inv: Invoice) {
     setBusy(inv.id);
@@ -48,12 +62,36 @@ export function ChargesManager({ initial }: { initial: Invoice[] }) {
                 {i.status === "PAID" ? "Pago" : i.status === "FAILED" ? "Falhou" : "Pendente"}
               </span>
               {i.status === "PENDING" && (
-                <button onClick={() => markPaid(i)} disabled={busy === i.id} className="vixt-btn-ghost !py-2 text-xs">
-                  {busy === i.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><Check className="h-3.5 w-3.5" /> Registrar pagamento</>}
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  {asaasConfigured && (
+                    <button onClick={() => chargeAsaas(i)} disabled={busy === i.id} className="vixt-btn-champagne !py-2 text-xs">
+                      {busy === i.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><QrCode className="h-3.5 w-3.5" /> Cobrar no Asaas</>}
+                    </button>
+                  )}
+                  <button onClick={() => markPaid(i)} disabled={busy === i.id} className="vixt-btn-ghost !py-2 text-xs">
+                    <Check className="h-3.5 w-3.5" /> Registrar manualmente
+                  </button>
+                </div>
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {pix && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4" onClick={() => setPix(null)}>
+          <div className="vixt-card w-full max-w-md space-y-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="flex items-center gap-2 font-semibold text-white"><QrCode className="h-5 w-5 text-rose-400" /> Cobrança PIX gerada</h3>
+            {pix.url && <a href={pix.url} target="_blank" rel="noreferrer" className="vixt-btn-primary w-full">Abrir cobrança no Asaas</a>}
+            {pix.copy && (
+              <div>
+                <p className="vixt-label">PIX Copia e Cola</p>
+                <textarea readOnly value={pix.copy} className="vixt-input h-24 resize-none text-xs" />
+                <button onClick={() => { navigator.clipboard.writeText(pix.copy!); toast("PIX copiado"); }} className="vixt-btn-ghost mt-2 w-full">Copiar código PIX</button>
+              </div>
+            )}
+            <button onClick={() => setPix(null)} className="vixt-btn-ghost w-full">Fechar</button>
+          </div>
         </div>
       )}
     </div>

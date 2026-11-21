@@ -132,6 +132,7 @@ model Company {
   workingHours      WorkingHour[]
   cancellationPolicy CancellationPolicy?
   commissions       Commission[]
+  asaasCustomer     AsaasCustomer?
 
   @@index([ownerId])
   @@index([status])
@@ -265,6 +266,51 @@ model PlatformPayment {
   user    User?    @relation(fields: [userId], references: [id])
 
   @@map("platform_payments")
+}
+
+// ============================================================
+// ASAAS (WALLET & PAYMENTS)
+// ============================================================
+
+model AsaasCustomer {
+  id          String   @id @default(cuid())
+  companyId   String   @unique @map("company_id")
+  customerId  String   @unique @map("customer_id")
+  walletId    String?  @map("wallet_id")
+  email       String?
+  cpfCnpj     String?  @map("cpf_cnpj")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("asaas_customers")
+}
+
+/// Eventos de webhook do Asaas — garantem idempotência no processamento.
+model AsaasEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique @map("event_id")
+  eventType   String   @map("event_type")
+  paymentId   String?  @map("payment_id")
+  payload     Json
+  processed   Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([eventType])
+  @@map("asaas_events")
+}
+
+/// Configuração global da carteira Asaas (chave nunca exposta ao cliente).
+model AsaasConfig {
+  id            String   @id @default(cuid())
+  environment   String   @default("sandbox")
+  apiKey        String   @map("api_key")
+  walletId      String?  @map("wallet_id")
+  webhookToken  String?  @map("webhook_token")
+  active        Boolean  @default(true)
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("asaas_config")
 }
 
 // ============================================================

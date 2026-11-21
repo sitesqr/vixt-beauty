@@ -64,6 +64,19 @@ Salão demo: `/b/belle-essence`
 | `NODE_ENV` | `development` ou `production` |
 | `GOOGLE_CLIENT_ID` | Client ID OAuth do Google (verificação do ID token no servidor) |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | O mesmo Client ID, usado pelo botão no navegador |
+| `ASAAS_API_KEY` | API key da sua conta Asaas (também configurável em `/admin/asaas`) |
+| `ASAAS_ENVIRONMENT` | `sandbox` ou `production` |
+| `ASAAS_WALLET_ID` | ID da carteira Asaas (opcional) |
+| `ASAAS_WEBHOOK_TOKEN` | Token de segurança do webhook (opcional, recomendado) |
+
+### Carteira Asaas (pagamentos das assinaturas)
+O painel **SUPER ADMIN → Carteira Asaas** (`/admin/asaas`) permite configurar API key, ambiente e carteira, visualizar saldo e cobranças, e registrar o webhook no Asaas.
+
+Fluxo:
+1. Configure a API key em `/admin/asaas` (salva criptografada no banco) ou via `.env`.
+2. Clique em **Configurar webhook no Asaas** — registra `https://seu-dominio/api/asaas/webhook`.
+3. Em **Cobranças**, use **Cobrar no Asaas** para gerar um PIX de uma fatura pendente.
+4. Quando o pagamento é confirmado, o webhook marca a fatura como paga e reativa a assinatura automaticamente (idempotente por `eventId`).
 
 ### Login com Google (opcional, apenas clientes)
 1. No [Google Cloud Console](https://console.cloud.google.com/apis/credentials), crie uma credencial do tipo **ID do cliente OAuth**.
