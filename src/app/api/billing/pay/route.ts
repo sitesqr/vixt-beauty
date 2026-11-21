@@ -55,6 +55,12 @@ export async function POST(req: NextRequest) {
       email: company.email,
       phone: company.phone,
       cpfCnpj: company.cpfCnpj,
+      address: company.address,
+      addressNumber: company.addressNumber,
+      neighborhood: company.neighborhood,
+      city: company.city,
+      state: company.state,
+      zipCode: company.zipCode,
     });
 
     if (method === "PIX") {

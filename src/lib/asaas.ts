@@ -69,14 +69,34 @@ export async function ensureCustomer(company: {
   email: string | null;
   phone: string | null;
   cpfCnpj?: string | null;
+  address?: string | null;
+  addressNumber?: string | null;
+  neighborhood?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zipCode?: string | null;
 }): Promise<AsaasCustomer> {
+  function addressPayload() {
+    const a: Record<string, string> = {};
+    if (company.address) a.address = company.address.slice(0, 100);
+    if (company.addressNumber) a.addressNumber = company.addressNumber;
+    if (company.neighborhood) a.province = company.neighborhood;
+    if (company.city) a.city = company.city;
+    if (company.state) a.state = company.state;
+    if (company.zipCode) a.postalCode = company.zipCode.replace(/\D/g, "");
+    return a;
+  }
+
   const existing = await prisma.asaasCustomer.findUnique({ where: { companyId: company.id } });
   if (existing) {
-    // Atualiza o CPF/CNPJ no Asaas se foi cadastrado depois da criação do cliente.
-    if (company.cpfCnpj && company.cpfCnpj !== existing.cpfCnpj) {
+    // Atualiza CPF/CNPJ e endereço no Asaas se mudaram depois da criação do cliente.
+    const patch: Record<string, string> = {};
+    if (company.cpfCnpj && company.cpfCnpj !== existing.cpfCnpj) patch.cpfCnpj = company.cpfCnpj;
+    Object.assign(patch, addressPayload());
+    if (Object.keys(patch).length) {
       try {
-        await request("PUT", `/customers/${existing.customerId}`, { cpfCnpj: company.cpfCnpj });
-        await prisma.asaasCustomer.update({ where: { id: existing.id }, data: { cpfCnpj: company.cpfCnpj } });
+        await request("PUT", `/customers/${existing.customerId}`, patch);
+        if (patch.cpfCnpj) await prisma.asaasCustomer.update({ where: { id: existing.id }, data: { cpfCnpj: patch.cpfCnpj } });
       } catch { /* mantém cliente existente se a atualização falhar */ }
     }
     return { id: existing.customerId, name: company.name, email: existing.email || undefined };
@@ -86,6 +106,7 @@ export async function ensureCustomer(company: {
   const payload: Record<string, string> = {
     name: company.name,
     email: company.email || `contato+${company.id}@vixtbeauty.com`,
+    ...addressPayload(),
   };
   if (company.cpfCnpj) payload.cpfCnpj = company.cpfCnpj;
   if (company.phone) payload.mobilePhone = company.phone.replace(/\D/g, "");
